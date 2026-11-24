@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Little Workshop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e1013;
+  --panel:#161a1f;
+  --panel-2:#1c2127;
+  --side:#0b0d10;
+  --line:#2b3138;
+  --line-2:#3a424b;
+  --brass:#c9a45c;
+  --brass-dim:#8a7142;
+  --text:#e4e0d4;
+  --muted:#8c929b;
+  --display:'Barlow Condensed','Segoe UI',sans-serif;
+  --body:'Barlow','Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  display:grid;grid-template-columns:230px 1fr;height:100vh;overflow:hidden;
+  background:radial-gradient(1100px 500px at 75% -10%,#1b1f25 0%,transparent 60%),var(--bg);
+  color:var(--text);font:15px/1.4 var(--body);
+}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--display);margin:0}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:4px}
+
+/* Kenar çubuğu */
+.side{background:var(--side);border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;gap:24px}
+.brand{display:flex;gap:12px;align-items:center;padding:4px 6px}
+.brand small{display:block;font:600 11px var(--display);letter-spacing:.25em;color:var(--brass-dim)}
+.brand b{display:block;font:700 22px/1 var(--display);letter-spacing:.06em;color:var(--brass);margin-top:3px}
+.side nav{display:flex;flex-direction:column;gap:6px}
+.nav{background:none;border:1px solid transparent;border-radius:3px;text-align:left;padding:10px 12px;color:var(--muted);font:600 17px var(--display);letter-spacing:.03em;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+.nav:hover{color:var(--text);border-color:var(--line)}
+.nav.active{color:var(--text);background:var(--panel-2);border-color:var(--brass-dim);box-shadow:inset 3px 0 0 var(--brass)}
+.foot{margin-top:auto;font-size:12px;color:#5c626b;line-height:1.5}
+
+/* Ana alan */
+main{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid var(--line)}
+.title-wrap{display:flex;align-items:baseline;gap:12px}
+h1{font-size:32px;font-weight:700;line-height:1;letter-spacing:.02em}
+#view{padding:22px 28px 32px;overflow:auto;flex:1}
+.muted{color:var(--muted);font-size:13px}
+
+/* Butonlar ve seçim kutuları */
+.btn{font:600 14px var(--display);letter-spacing:.05em;padding:9px 16px;border-radius:3px;border:1px solid var(--line-2);background:var(--panel-2);cursor:pointer;transition:border-color .15s,color .15s,filter .15s,background .15s;white-space:nowrap}
+.btn:hover{border-color:var(--brass)}
+.btn.primary{background:linear-gradient(#cba85f,#a88640);color:#17120a;border-color:#e2c17a}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent}
+.btn.danger:hover{border-color:#c24a3c;color:#e8806f}
+.icon-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 6px;font-size:13px;border-radius:2px}
+.icon-btn:hover{color:var(--brass)}
+.icon-btn.del:hover{color:#e8806f}
+.select{background:var(--side);border:1px solid var(--line-2);border-radius:3px;padding:6px 8px;font:14px var(--body);cursor:pointer;min-width:200px}
+.select:focus{outline:none;border-color:var(--brass)}
+.sort{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-left:auto}
+
+/* Etiketler */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+.tag{--c:#8c929b;font:600 12px var(--body);padding:4px 10px;border-radius:2px;border:1px solid color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 10%,transparent);color:var(--text);cursor:pointer}
+.tag:hover{background:color-mix(in srgb,var(--c) 22%,transparent)}
+.tag.on{background:color-mix(in srgb,var(--c) 38%,transparent);border-color:var(--c)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;min-height:22px}
+.chip{--c:#8c929b;display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 8px;border-radius:2px;background:color-mix(in srgb,var(--c) 20%,transparent);border:1px solid color-mix(in srgb,var(--c) 60%,transparent);color:var(--text)}
+.chip-x{background:none;border:none;color:inherit;cursor:pointer;padding:0 0 0 2px;font-size:11px;opacity:.7}
+.chip-x:hover{opacity:1}
+
+/* Proje kartları */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.card{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:4px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:border-color .2s,transform .2s}
+.card:hover{border-color:var(--brass-dim);transform:translateY(-2px)}
+.card-head{display:flex;justify-content:space-between;align-items:center}
+.card h3{font-size:22px;font-weight:700;line-height:1.1;letter-spacing:.02em}
+.desc{margin:0;color:var(--muted);font-size:14px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:1.45em}
+.level{font-size:12px;color:var(--muted)}
+.progress-meta{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted);margin-top:auto}
+.progress-meta b{font:700 18px var(--display)}
+.due{font-size:12px;color:var(--muted)}
+.due.soon{color:#d9a53b}
+.due.late{color:#e8806f}
+
+/* Çarklar */
+.gears{display:flex;gap:3px;align-items:center}
+.gear{display:block}
+.gear .hole{fill:var(--panel)}
+
+/* Çubuklar */
+.bar{height:8px;background:var(--side);border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;transition:width .45s ease,background-color .3s}
+.bar.lg{height:12px;margin:18px 0 24px}
+
+.empty{grid-column:1/-1;color:var(--muted);border:1px dashed var(--line-2);padding:40px 20px;text-align:center;border-radius:4px;list-style:none}
+
+/* Proje detayı */
+.detail-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.hero{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;background:linear-gradient(90deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-left:3px solid var(--brass);border-radius:4px;padding:20px 22px}
+.hero h2{font-size:30px;font-weight:700;line-height:1;margin-bottom:8px}
+.hero .desc{display:block;overflow:visible;-webkit-line-clamp:unset;margin-bottom:10px}
+.hero .due{display:block;margin-top:8px}
+.hero-stat{text-align:right}
+.hero-stat b{font:700 38px/1 var(--display)}
+.hero-stat span{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.section-head h3{font-size:20px;font-weight:600;letter-spacing:.03em}
+.section-head .right{display:flex;gap:10px;align-items:center}
+
+/* Görevler */
+.tasks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.task{display:flex;gap:14px;align-items:flex-start;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:3px;cursor:pointer;transition:border-color .15s,background .15s}
+.task:hover{border-color:var(--line-2)}
+.task:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+.task .box{flex:none;width:20px;height:20px;border:1px solid var(--line-2);border-radius:2px;display:grid;place-items:center;font-size:13px;font-weight:700;color:#14110b;margin-top:1px;transition:background .2s,border-color .2s}
+.task.done .box{background:#6aa84f;border-color:#6aa84f}
+.task.done{background:#13161a}
+.task-body{flex:1;min-width:0}
+.task-body b{font-weight:600;font-size:15px}
+.task-body p{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere}
+.task-body .due{display:block;margin-top:4px}
+.task.done .task-body b{text-decoration:line-through;color:var(--muted)}
+.task.done .task-body p{opacity:.6}
+.task-actions{display:flex;gap:2px;flex:none}
+.group{margin-bottom:26px}
+.group>header{display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:10px}
+.group h3{font-size:19px;font-weight:600}
+
+/* Proje görselleri */
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.img-card{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:hidden;display:flex;flex-direction:column}
+.img-card img{width:100%;height:150px;object-fit:cover;display:block;cursor:zoom-in;background:var(--side)}
+.img-card figcaption{padding:8px 10px 0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.img-actions{display:flex;justify-content:flex-end;padding:4px 6px 6px}
+.lightbox{max-width:92vw;max-height:90vh;object-fit:contain;cursor:zoom-out;box-shadow:0 20px 60px #000;border-radius:3px}
+.preview{width:100%;max-height:180px;object-fit:contain;background:var(--side);border:1px solid var(--line-2);border-radius:3px}
+.pick-label{margin:0 0 10px}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:26px}
+.pick{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:4px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}
+.pick:hover{border-color:var(--brass-dim)}
+.pick.on{border-color:var(--brass);background:var(--panel-2);box-shadow:inset 3px 0 0 var(--brass)}
+.pick b{font:700 18px/1.1 var(--display);letter-spacing:.02em}
+.pick .muted{font-size:12px}
+
+/* Pencere (modal) */
+.overlay{position:fixed;inset:0;background:rgba(5,6,8,.72);display:grid;place-items:center;z-index:50;padding:16px}
+.modal{background:var(--panel);border:1px solid var(--brass-dim);border-radius:4px;width:min(540px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 60px #000}
+.dlg-form{padding:24px;display:flex;flex-direction:column;gap:14px}
+.dlg-form h2{font-size:26px;font-weight:700}
+.dlg-form label,.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.dlg-form small{opacity:.7}
+.dlg-form input:not([type=radio]),.dlg-form textarea{font:15px var(--body);color:var(--text);background:var(--side);border:1px solid var(--line-2);border-radius:3px;padding:9px 11px;resize:vertical;width:100%}
+.dlg-form input:focus,.dlg-form textarea:focus{outline:none;border-color:var(--brass)}
+.dlg-form input[type=date]{color-scheme:dark}
+.levels{border:none;margin:0;padding:0;display:flex;gap:8px}
+.levels legend{font-size:13px;color:var(--muted);padding:0;margin-bottom:6px}
+.lvl{flex:1;position:relative;cursor:pointer}
+.lvl input{position:absolute;opacity:0;pointer-events:none}
+.lvl-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border:1px solid var(--line-2);border-radius:3px;color:var(--muted);font-size:13px;background:var(--side);transition:border-color .15s,color .15s}
+.lvl:hover .lvl-card{border-color:var(--brass-dim)}
+.lvl input:checked + .lvl-card{border-color:var(--brass);color:var(--text);background:var(--panel-2)}
+.lvl input:focus-visible + .lvl-card{outline:2px solid var(--brass);outline-offset:2px}
+.tag-add{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tag-add input{flex:1;min-width:140px}
+.swatches{display:flex;gap:6px;flex-wrap:wrap}
+.sw{width:22px;height:22px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;padding:0}
+.sw.on{border-color:#fff;box-shadow:0 0 0 2px var(--panel)}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px;min-height:26px;align-items:center}
+.err{margin:0;color:#e8806f;font-size:13px}
+.dlg-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:6px}
+
+@media (max-width:720px){
+  body{grid-template-columns:1fr}
+  .side{display:none}
+  .hero{grid-template-columns:1fr}
+  .hero-stat{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<aside class="side">
+  <div class="brand">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+      <path d="M17 2 32 17 17 32 2 17Z" fill="none" stroke="#c9a45c" stroke-width="1.5"/>
+      <path d="M17 9 25 17 17 25 9 17Z" fill="#c9a45c" opacity=".85"/>
+    </svg>
+    <div>
+      <small>LITTLE</small>
+      <b>WORKSHOP</b>
+    </div>
+  </div>
+  <nav>
+    <button class="nav active" data-view="projects">Projeler</button>
+    <button class="nav" data-view="tasks">Tüm Görevler</button>
+    <button class="nav" data-view="archive">Arşiv</button>
+    <button class="nav" data-view="images">Proje görselleri</button>
+  </nav>
+  <div class="foot">Veriler bu bilgisayarda saklanır.</div>
+</aside>
+
+<main>
+  <header class="top">
+    <div class="title-wrap">
+      <h1 id="title">Projeler</h1>
+      <span id="count" class="muted"></span>
+    </div>
+    <button class="btn primary" id="newProject">+ Yeni Proje</button>
+  </header>
+  <div id="view"></div>
+</main>
+
+<script>
+const KEY = 'little-workshop.v1';
+const LEVEL_NAME  = {1:'Basit', 2:'Orta ölçek', 3:'Detaylı / büyük'};
+const LEVEL_COLOR = {1:'#6aa84f', 2:'#d9833b', 3:'#c24a3c'};
+const TAG_COLORS  = {green:'#7fb35a', purple:'#9b6fc4', orange:'#e08a3c', red:'#d3553f', blue:'#4f8fc4', pink:'#e27bb0', white:'#ece9e1', navy:'#4a3d91'};
+const TAG_NAMES   = {green:'Yeşil', purple:'Mor', orange:'Turuncu', red:'Kırmızı', blue:'Mavi', pink:'Pembe', white:'Beyaz', navy:'Lacivert-mor'};
+const FULL_MSG    = 'Kayıt alanı dolu. Görselleri küçültmeyi ya da bazı görselleri silmeyi dene.';
+
+// Basit çark (8 diş) yolu, 24x24 kutuda
+const GEAR_PATH = (() => {
+  const T = 8, step = Math.PI * 2 / T, pts = [];
+  for (let i = 0; i < T; i++) {
+    const base = i * step - Math.PI / 2;
+    [[8.4, 0.08], [11, 0.22], [11, 0.36], [8.4, 0.5]]
+      .forEach(([r, f]) => pts.push([r, base + f * step]));
+  }
+  return 'M' + pts.map(([r, a]) =>
+    (12 + r * Math.cos(a)).toFixed(2) + ' ' + (12 + r * Math.sin(a)).toFixed(2)
+  ).join(' L') + ' Z';
+})();
+
+let state = load();
+let view = 'projects';
+let openId = null;
+let imagesPid = null;
+let filterTag = null;
+let sortBy = 'new';
+let taskSort = 'manual';
+
+/* ---------- Veri ---------- */
+function load() {
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) { s = null; }
+  if (!s || !Array.isArray(s.projects)) s = { projects: [] };
+  s.projects.forEach(p => {
+    p.title    = p.title || 'Adsız';
+    p.desc     = p.desc || '';
+    p.level    = p.level || 1;
+    p.due      = p.due || '';
+    p.created  = p.created || 0;
+    p.archived = !!p.archived;
+    p.tags = (p.tags || []).map(t => typeof t === 'string' ? { name: t, color: 'green' } : t);
+    p.tasks = (p.tasks || []).map(t => ({
+      id: t.id || uid(), title: t.title || '', desc: t.desc || '',
+      done: !!t.done, due: t.due || '', created: t.created || 0
+    }));
+    p.images = (p.images || []).filter(Boolean);
+  });
+  return s;
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); return true; }
+  catch (e) { return false; }
+}
+// Pencerelerde kaydetme başarısızsa son kayıtlı hâli geri yükle ve hata dön
+function commit() {
+  if (save()) return null;
+  state = load();
+  return FULL_MSG;
+}
+
+/* ---------- Yardımcılar ---------- */
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 10);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function active() { return state.projects.filter(p => !p.archived); }
+function find(id) { return state.projects.find(p => p.id === id); }
+function findTask(pid, tid) { return find(pid)?.tasks.find(t => t.id === tid); }
+function findImage(pid, iid) { return find(pid)?.images.find(i => i.id === iid); }
+function doneCount(p) { return p.tasks.filter(t => t.done).length; }
+function pct(p) { return p.tasks.length ? Math.round(doneCount(p) / p.tasks.length * 100) : 0; }
+function barColor(v) { return v < 40 ? '#c24a3c' : v < 80 ? '#d9a53b' : '#6aa84f'; }
+
+// Tarih yardımcıları (yerel saate göre)
+function daysLeft(due) {
+  if (!due) return null;
+  const [y, m, d] = due.split('-').map(Number);
+  const target = new Date(y, m - 1, d);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((target - today) / 86400000);
+}
+function fmtDate(due) {
+  const [y, m, d] = due.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+}
+function dueBadge(due, prefix = 'Son') {
+  const n = daysLeft(due);
+  if (n === null) return '';
+  const txt = n < 0 ? `${-n} gün gecikti` : n === 0 ? 'bugün' : `${n} gün kaldı`;
+  const cls = n < 0 ? 'late' : n <= 3 ? 'soon' : '';
+  return `<span class="due ${cls}">${prefix}: ${fmtDate(due)} · ${txt}</span>`;
+}
+function cmpDue(x, y) {
+  const kx = x ? Date.parse(x) : Infinity;
+  const ky = y ? Date.parse(y) : Infinity;
+  return kx === ky ? 0 : kx < ky ? -1 : 1;
+}
+
+// Sıralama seçenekleri
+const dueAsc  = (a, b) => cmpDue(a.due, b.due);
+const dueDesc = (a, b) => !a.due && b.due ? 1 : !b.due && a.due ? -1 : cmpDue(b.due, a.due);
+
+const PROJECT_SORTS = {
+  'new':           (a, b) => b.created - a.created,
+  'old':           (a, b) => a.created - b.created,
+  'name-asc':      (a, b) => a.title.localeCompare(b.title, 'tr'),
+  'name-desc':     (a, b) => b.title.localeCompare(a.title, 'tr'),
+  'progress-desc': (a, b) => pct(b) - pct(a),
+  'progress-asc':  (a, b) => pct(a) - pct(b),
+  'due-asc':       dueAsc,
+  'due-desc':      dueDesc,
+  'level-desc':    (a, b) => b.level - a.level,
+  'level-asc':     (a, b) => a.level - b.level
+};
+const PROJECT_SORT_LABELS = {
+  'new': 'Son eklenen önce',
+  'old': 'İlk eklenen önce',
+  'name-asc': 'Ada göre (A → Z)',
+  'name-desc': 'Ada göre (Z → A)',
+  'progress-desc': 'İlerleme (yüksek → düşük)',
+  'progress-asc': 'İlerleme (düşük → yüksek)',
+  'due-asc': 'Son tarih (yakın → uzak)',
+  'due-desc': 'Son tarih (uzak → yakın)',
+  'level-desc': 'Büyüklük (3 çark → 1 çark)',
+  'level-asc': 'Büyüklük (1 çark → 3 çark)'
+};
+const TASK_SORTS = {
+  manual:       null,
+  'open-first': (a, b) => Number(a.done) - Number(b.done),
+  'done-first': (a, b) => Number(b.done) - Number(a.done),
+  'due-asc':    (a, b) => Number(a.done) - Number(b.done) || dueAsc(a, b),
+  'due-desc':   (a, b) => Number(a.done) - Number(b.done) || dueDesc(a, b)
+};
+const TASK_SORT_LABELS = {
+  manual: 'Eklenme sırası',
+  'open-first': 'Tamamlanmayanlar önce',
+  'done-first': 'Tamamlananlar önce',
+  'due-asc': 'Son tarih (yakın → uzak)',
+  'due-desc': 'Son tarih (uzak → yakın)'
+};
+function sortTasks(list) {
+  const f = TASK_SORTS[taskSort];
+  return f ? [...list].sort(f) : list;
+}
+function options(map, current) {
+  return Object.entries(map).map(([k, label]) =>
+    `<option value="${k}" ${k === current ? 'selected' : ''}>${label}</option>`).join('');
+}
+
+function gear(level, size = 16) {
+  const c = LEVEL_COLOR[level];
+  return Array.from({length: level}, () =>
+    `<svg class="gear" width="${size}" height="${size}" viewBox="0 0 24 24" aria-label="${LEVEL_NAME[level]}">
+       <path d="${GEAR_PATH}" fill="${c}"/>
+       <circle class="hole" cx="12" cy="12" r="3.4"/>
+     </svg>`).join('');
+}
+function tagChips(p) {
+  return p.tags.map(t =>
+    `<span class="chip" style="--c:${TAG_COLORS[t.color] || TAG_COLORS.green}">${esc(t.name)}</span>`).join('');
+}
+
+/* ---------- Görünümler ---------- */
+function render() {
+  document.querySelectorAll('.nav').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  const title = $('#title'), count = $('#count'), host = $('#view');
+  $('#newProject').hidden = view !== 'projects' || !!openId;
+
+  if (view === 'tasks') {
+    title.textContent = 'Tüm Görevler';
+    const total = active().reduce((n, p) => n + p.tasks.length, 0);
+    count.textContent = `${total} görev`;
+    host.innerHTML = renderAllTasks();
+    return;
+  }
+
+  if (view === 'images') {
+    title.textContent = 'Proje görselleri';
+    count.textContent = '';
+    host.innerHTML = renderImages();
+    return;
+  }
+
+  const p = openId && find(openId);
+  if (p) {
+    title.textContent = 'Proje detayı';
+    count.textContent = '';
+    host.innerHTML = renderProject(p);
+    return;
+  }
+
+  openId = null;
+
+  if (view === 'archive') {
+    const list = state.projects.filter(p => p.archived).sort(PROJECT_SORTS['new']);
+    title.textContent = 'Arşiv';
+    count.textContent = `${list.length} proje`;
+    host.innerHTML = list.length
+      ? `<div class="grid">${list.map(card).join('')}</div>`
+      : '<div class="empty">Arşivde proje yok. Bir projeyi açıp "Projeyi arşivle" diyerek buraya taşıyabilirsin.</div>';
+    return;
+  }
+
+  title.textContent = 'Projeler';
+  count.textContent = `${active().length} proje`;
+  host.innerHTML = renderProjects();
+}
+
+function renderProjects() {
+  const list0 = active();
+  const colors = new Map();
+  list0.forEach(p => p.tags.forEach(t => { if (!colors.has(t.name)) colors.set(t.name, t.color); }));
+  const names = [...colors.keys()].sort((a, b) => a.localeCompare(b, 'tr'));
+
+  const list = list0
+    .filter(p => !filterTag || p.tags.some(t => t.name === filterTag))
+    .sort(PROJECT_SORTS[sortBy]);
+
+  const filters = `
+    <div class="filters">
+      ${names.length ? `<span class="muted">Etikete göre:</span>` : ''}
+      ${names.map(n => `<button class="tag ${filterTag === n ? 'on' : ''}" style="--c:${TAG_COLORS[colors.get(n)] || TAG_COLORS.green}" data-tag="${esc(n)}">${esc(n)}</button>`).join('')}
+      <label class="sort">Sırala
+        <select class="select" data-psort>${options(PROJECT_SORT_LABELS, sortBy)}</select>
+      </label>
+    </div>`;
+
+  const cards = list.length
+    ? list.map(card).join('')
+    : `<div class="empty">${list0.length ? 'Bu etikette proje yok.' : 'Henüz proje yok. "+ Yeni Proje" ile başla.'}</div>`;
+
+  return `${filters}<div class="grid">${cards}</div>`;
+}
+
+function card(p) {
+  const v = pct(p), done = doneCount(p);
+  return `
+  <article class="card" data-open="${p.id}" tabindex="0">
+    <div class="card-head">
+      <div class="gears">${gear(p.level)}</div>
+      <span class="level">${LEVEL_NAME[p.level]}</span>
+    </div>
+    <h3>${esc(p.title)}</h3>
+    <p class="desc">${esc(p.desc)}</p>
+    <div class="tags">${tagChips(p)}</div>
+    ${p.due ? dueBadge(p.due) : ''}
+    <div class="progress-meta">
+      <span>${done}/${p.tasks.length} görev</span>
+      <b style="color:${barColor(v)}">%${v}</b>
+    </div>
+    <div class="bar"><i style="width:${v}%;background:${barColor(v)}"></i></div>
+  </article>`;
+}
+
+function renderProject(p) {
+  const v = pct(p), done = doneCount(p);
+  const rows = sortTasks(p.tasks).map(t => taskRow(p.id, t)).join('');
+  return `
+  <div class="detail-head">
+    <button class="btn ghost" data-action="back">← Geri</button>
+    <div class="actions">
+      <button class="btn ghost" data-action="images">Görseller</button>
+      <button class="btn ghost" data-action="edit-project">Projeyi düzenle</button>
+      <button class="btn ghost" data-action="archive">${p.archived ? 'Arşivden çıkar' : 'Projeyi arşivle'}</button>
+      <button class="btn danger" data-action="del-project">Projeyi sil</button>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="gears">${gear(p.level, 30)}</div>
+    <div>
+      <h2>${esc(p.title)}</h2>
+      ${p.desc ? `<p class="desc">${esc(p.desc)}</p>` : ''}
+      <div class="tags">${tagChips(p)}</div>
+      ${p.due ? dueBadge(p.due) : ''}
+    </div>
+    <div class="hero-stat">
+      <b style="color:${barColor(v)}">%${v}</b>
+      <span>${done}/${p.tasks.length} tamamlandı</span>
+    </div>
+  </section>
+
+  <div class="bar lg"><i style="width:${v}%;background:${barColor(v)}"></i></div>
+
+  <div class="section-head">
+    <h3>Görevler</h3>
+    <div class="right">
+      <select class="select" data-tsort aria-label="Görevleri sırala">${options(TASK_SORT_LABELS, taskSort)}</select>
+      <button class="btn primary" data-action="new-task">+ Görev ekle</button>
+    </div>
+  </div>
+  <ul class="tasks">
+    ${p.tasks.length
+      ? rows
+      : '<li class="empty">Henüz görev yok. Görev ekleyip tamamladıkça ilerleme burada görünür.</li>'}
+  </ul>`;
+}
+
+function renderAllTasks() {
+  const groups = active().filter(p => p.tasks.length);
+  if (!groups.length) return '<div class="empty">Henüz görev yok.</div>';
+  return groups.map(p => `
+    <section class="group">
+      <header data-open="${p.id}">
+        <span class="gears">${gear(p.level, 14)}</span>
+        <h3>${esc(p.title)}</h3>
+        <span class="muted">${doneCount(p)}/${p.tasks.length}</span>
+      </header>
+      <ul class="tasks">${sortTasks(p.tasks).map(t => taskRow(p.id, t)).join('')}</ul>
+    </section>`).join('');
+}
+
+function taskRow(pid, t) {
+  return `
+  <li class="task ${t.done ? 'done' : ''}" tabindex="0" role="checkbox" aria-checked="${t.done}"
+      data-toggle="${t.id}" data-pid="${pid}">
+    <span class="box">${t.done ? '✓' : ''}</span>
+    <div class="task-body">
+      <b>${esc(t.title)}</b>
+      ${t.desc ? `<p>${esc(t.desc)}</p>` : ''}
+      ${t.due && !t.done ? dueBadge(t.due, 'Bitiş') : ''}
+    </div>
+    <div class="task-actions">
+      <button class="icon-btn" title="Görevi düzenle" aria-label="Görevi düzenle"
+        data-edit-task="${t.id}" data-pid="${pid}">✎</button>
+      <button class="icon-btn del" title="Görevi sil" aria-label="Görevi sil"
+        data-del-task="${t.id}" data-pid="${pid}">✕</button>
+    </div>
+  </li>`;
+}
+
+function renderImages() {
+  if (!state.projects.length) return '<div class="empty">Henüz proje yok. Önce bir proje oluştur.</div>';
+  if (!imagesPid || !find(imagesPid)) imagesPid = state.projects[0].id;
+  const p = find(imagesPid);
+
+  const picker = `
+    <p class="muted pick-label">Görselleri görmek istediğin projeyi seç</p>
+    <div class="pick-grid">
+      ${state.projects.map(x => `
+        <button class="pick ${x.id === p.id ? 'on' : ''}" data-imgpick="${x.id}">
+          <span class="gears">${gear(x.level, 14)}</span>
+          <b>${esc(x.title)}</b>
+          <span class="muted">${x.images.length} görsel${x.archived ? ' · arşiv' : ''}</span>
+        </button>`).join('')}
+    </div>`;
+
+  const body = p.images.length
+    ? `<div class="img-grid">${p.images.map(img => imgCard(p.id, img)).join('')}</div>`
+    : '<div class="empty">Bu projede henüz görsel yok. "+ Görsel ekle" ile başla.</div>';
+
+  return `
+    ${picker}
+    <div class="section-head">
+      <h3>${esc(p.title)}</h3>
+      <button class="btn primary" data-action="add-image">+ Görsel ekle</button>
+    </div>
+    ${body}`;
+}
+
+function imgCard(pid, img) {
+  return `
+  <figure class="img-card">
+    <img src="${img.data}" alt="${esc(img.name)}" data-zoom="${img.id}" data-pid="${pid}" loading="lazy">
+    <figcaption>${esc(img.name) || '<span class="muted">Açıklamasız</span>'}</figcaption>
+    <div class="img-actions">
+      <button class="icon-btn" title="Düzenle" aria-label="Düzenle" data-img-edit="${img.id}" data-pid="${pid}">✎</button>
+      <button class="icon-btn del" title="Sil" aria-label="Sil" data-img-del="${img.id}" data-pid="${pid}">✕</button>
+    </div>
+  </figure>`;
+}
+
+/* ---------- İşlemler ---------- */
+function toggleTask(pid, tid) {
+  const t = findTask(pid, tid);
+  if (!t) return;
+  t.done = !t.done;
+  save(); render();
+}
+
+function deleteTask(pid, tid) {
+  const p = find(pid);
+  if (!p || !confirm('Bu görev silinsin mi?')) return;
+  p.tasks = p.tasks.filter(t => t.id !== tid);
+  save(); render();
+}
+
+function deleteImage(pid, iid) {
+  const p = find(pid);
+  if (!p || !confirm('Bu görsel silinsin mi?')) return;
+  p.images = p.images.filter(i => i.id !== iid);
+  save(); render();
+}
+
+function action(a) {
+  if (a === 'back') { openId = null; return render(); }
+  if (a === 'add-image') return imageModal(imagesPid, null);
+
+  const p = openId && find(openId);
+  if (!p) return;
+  if (a === 'edit-project') return projectModal(p);
+  if (a === 'new-task') return taskModal(p, null);
+  if (a === 'images') { imagesPid = p.id; openId = null; view = 'images'; return render(); }
+  if (a === 'archive') { p.archived = !p.archived; openId = null; save(); return render(); }
+  if (a === 'del-project' && confirm(`"${p.title}" ve içindeki tüm görevler ve görseller silinsin mi?`)) {
+    state.projects = state.projects.filter(x => x !== p);
+    openId = null; save(); render();
+  }
+}
+
+/* ---------- Pencere ---------- */
+// onSave(ov) boş değilse hata metni döndürür; init(ov) pencere açıldıktan sonra çalışır.
+function modal(title, body, onSave, init) {
+  document.querySelector('.overlay')?.remove();
+  const ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+      <div class="dlg-form">
+        <h2>${title}</h2>
+        ${body}
+        <p class="err" hidden></p>
+        <div class="dlg-actions">
+          <button type="button" class="btn ghost" data-cancel>Vazgeç</button>
+          <button type="button" class="btn primary" data-save>Kaydet</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+
+  const close = () => ov.remove();
+  const err = ov.querySelector('.err');
+  const trySave = () => {
+    const msg = onSave(ov);
+    if (msg) { err.textContent = msg; err.hidden = false; return; }
+    close(); render();
+  };
+
+  ov.addEventListener('click', e => {
+    if (e.target === ov || e.target.closest('[data-cancel]')) return close();
+    if (e.target.closest('[data-save]')) trySave();
+  });
+  ov.addEventListener('keydown', e => {
+    if (e.key === 'Escape') return close();
+    if (e.key === 'Enter' && e.target.tagName === 'INPUT' && !e.defaultPrevented) {
+      e.preventDefault(); trySave();
+    }
+  });
+
+  if (init) init(ov);
+  ov.querySelector('input:not([type=radio]):not([type=file]), textarea')?.focus();
+}
+
+function projectModal(p) {
+  let tags = p ? p.tags.map(t => ({ ...t })) : [];
+  let color = 'green';
+  const cur = p?.level || 1;
+
+  modal(p ? 'Projeyi düzenle' : 'Yeni proje', `
+    <label>Başlık
+      <input name="title" maxlength="60" value="${esc(p?.title)}">
+    </label>
+    <label>Açıklama
+      <textarea name="desc" rows="3">${esc(p?.desc)}</textarea>
+    </label>
+    <fieldset class="levels">
+      <legend>Büyüklük / zorluk</legend>
+      ${[1, 2, 3].map(l => `
+        <label class="lvl">
+          <input type="radio" name="level" value="${l}" ${l === cur ? 'checked' : ''}>
+          <span class="lvl-card">${gear(l, 20)}<span>${LEVEL_NAME[l]}</span></span>
+        </label>`).join('')}
+    </fieldset>
+    <label>Son tarih <small>isteğe bağlı</small>
+      <input type="date" name="due" value="${esc(p?.due)}">
+    </label>
+    <div class="field">
+      <span>Etiketler</span>
+      <div class="tag-add">
+        <div class="swatches">
+          ${Object.entries(TAG_COLORS).map(([k, c]) =>
+            `<button type="button" class="sw ${k === color ? 'on' : ''}" style="--c:${c}"
+               data-sw="${k}" title="${TAG_NAMES[k]}" aria-label="${TAG_NAMES[k]}"></button>`).join('')}
+        </div>
+        <input name="newtag" maxlength="20" placeholder="Etiket adı">
+        <button type="button" class="btn" data-addtag>Ekle</button>
+      </div>
+      <div class="tag-list"></div>
+    </div>`,
+  ov => {
+    const title = ov.querySelector('[name=title]').value.trim();
+    if (!title) return 'Başlık boş olamaz.';
+    const data = {
+      title,
+      desc: ov.querySelector('[name=desc]').value.trim(),
+      level: Number(ov.querySelector('[name=level]:checked')?.value) || 1,
+      due: ov.querySelector('[name=due]').value,
+      tags
+    };
+    if (p) Object.assign(p, data);
+    else state.projects.unshift({ id: uid(), created: Date.now(), tasks: [], images: [], archived: false, ...data });
+    return commit();
+  },
+  ov => {
+    const list = ov.querySelector('.tag-list');
+    const input = ov.querySelector('[name=newtag]');
+    const swatches = ov.querySelectorAll('[data-sw]');
+
+    const drawTags = () => {
+      list.innerHTML = tags.length
+        ? tags.map((t, i) => `
+            <span class="chip" style="--c:${TAG_COLORS[t.color]}">${esc(t.name)}
+              <button type="button" class="chip-x" data-rm="${i}" aria-label="Etiketi kaldır">✕</button>
+            </span>`).join('')
+        : '<span class="muted">Henüz etiket yok.</span>';
+    };
+
+    swatches.forEach(b => b.addEventListener('click', () => {
+      color = b.dataset.sw;
+      swatches.forEach(x => x.classList.toggle('on', x === b));
+    }));
+
+    const addTag = () => {
+      const name = input.value.trim();
+      if (name && !tags.some(t => t.name.toLowerCase() === name.toLowerCase())) {
+        tags.push({ name, color });
+        drawTags();
+      }
+      input.value = '';
+      input.focus();
+    };
+    ov.querySelector('[data-addtag]').addEventListener('click', addTag);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); addTag(); }
+    });
+    list.addEventListener('click', e => {
+      const b = e.target.closest('[data-rm]');
+      if (b) { tags.splice(Number(b.dataset.rm), 1); drawTags(); }
+    });
+    drawTags();
+  });
+}
+
+function taskModal(p, t) {
+  modal(t ? 'Görevi düzenle' : 'Yeni görev', `
+    <label>Görev başlığı
+      <input name="title" maxlength="80" value="${esc(t?.title)}">
+    </label>
+    <label>Açıklama
+      <textarea name="desc" rows="3">${esc(t?.desc)}</textarea>
+    </label>
+    <label>Son tarih <small>isteğe bağlı</small>
+      <input type="date" name="due" value="${esc(t?.due)}">
+    </label>`,
+  ov => {
+    const title = ov.querySelector('[name=title]').value.trim();
+    if (!title) return 'Görev başlığı boş olamaz.';
+    const data = {
+      title,
+      desc: ov.querySelector('[name=desc]').value.trim(),
+      due: ov.querySelector('[name=due]').value
+    };
+    if (t) Object.assign(t, data);
+    else p.tasks.push({ id: uid(), done: false, created: Date.now(), ...data });
+    return commit();
+  });
+}
+
+// Görsel ekleme ve düzenleme. Görsel tarayıcıda küçültülüp JPEG olarak saklanır.
+function compressImage(file, maxSide = 1280, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, maxSide / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(img.width * s));
+      c.height = Math.max(1, Math.round(img.height * s));
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Görsel okunamadı.')); };
+    img.src = url;
+  });
+}
+
+function imageModal(pid, img) {
+  let pending = null;
+  modal(img ? 'Görseli düzenle' : 'Görsel ekle', `
+    <label>Açıklama <small>isteğe bağlı</small>
+      <input name="cap" maxlength="80" value="${esc(img?.name)}">
+    </label>
+    <label>${img ? 'Görseli değiştir (isteğe bağlı)' : 'Görsel seç'}
+      <input type="file" name="file" accept="image/*">
+    </label>
+    ${img ? `<img class="preview" src="${img.data}" alt="">` : ''}
+    <p class="muted" data-status></p>`,
+  ov => {
+    if (!img && !pending) return 'Bir görsel seç.';
+    const p = find(pid);
+    if (!p) return 'Proje bulunamadı.';
+    const name = ov.querySelector('[name=cap]').value.trim();
+    if (img) {
+      img.name = name;
+      if (pending) img.data = pending;
+    } else {
+      p.images.push({ id: uid(), name, data: pending, created: Date.now() });
+    }
+    return commit();
+  },
+  ov => {
+    const file = ov.querySelector('[name=file]');
+    const status = ov.querySelector('[data-status]');
+    file.addEventListener('change', async () => {
+      const f = file.files[0];
+      if (!f) return;
+      status.textContent = 'Görsel hazırlanıyor...';
+      try {
+        pending = await compressImage(f);
+        status.textContent = 'Görsel hazır. Kaydet ile ekleyebilirsin.';
+      } catch (err) {
+        pending = null;
+        status.textContent = err.message;
+      }
+    });
+  });
+}
+
+function lightbox(src) {
+  const ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.innerHTML = `<img class="lightbox" src="${src}" alt="">`;
+  ov.addEventListener('click', () => ov.remove());
+  document.body.appendChild(ov);
+}
+
+/* ---------- Olaylar ---------- */
+$('#newProject').addEventListener('click', () => projectModal(null));
+
+document.addEventListener('click', e => {
+  const t = e.target;
+
+  const nav = t.closest('.nav');
+  if (nav) { view = nav.dataset.view; openId = null; return render(); }
+
+  const tag = t.closest('[data-tag]');
+  if (tag) { filterTag = filterTag === tag.dataset.tag ? null : tag.dataset.tag; return render(); }
+
+  const pick = t.closest('[data-imgpick]');
+  if (pick) { imagesPid = pick.dataset.imgpick; return render(); }
+
+  const zoom = t.closest('[data-zoom]');
+  if (zoom) {
+    const img = findImage(zoom.dataset.pid, zoom.dataset.zoom);
+    if (img) lightbox(img.data);
+    return;
+  }
+
+  const imgEdit = t.closest('[data-img-edit]');
+  if (imgEdit) {
+    const img = findImage(imgEdit.dataset.pid, imgEdit.dataset.imgEdit);
+    if (img) imageModal(imgEdit.dataset.pid, img);
+    return;
+  }
+
+  const imgDel = t.closest('[data-img-del]');
+  if (imgDel) return deleteImage(imgDel.dataset.pid, imgDel.dataset.imgDel);
+
+  const del = t.closest('[data-del-task]');
+  if (del) { e.stopPropagation(); return deleteTask(del.dataset.pid, del.dataset.delTask); }
+
+  const edit = t.closest('[data-edit-task]');
+  if (edit) {
+    e.stopPropagation();
+    const p = find(edit.dataset.pid);
+    const task = findTask(edit.dataset.pid, edit.dataset.editTask);
+    if (p && task) taskModal(p, task);
+    return;
+  }
+
+  const tog = t.closest('[data-toggle]');
+  if (tog) return toggleTask(tog.dataset.pid, tog.dataset.toggle);
+
+  const act = t.closest('[data-action]');
+  if (act) return action(act.dataset.action);
+
+  const open = t.closest('[data-open]');
+  if (open) {
+    openId = open.dataset.open;
+    if (view === 'tasks') view = 'projects';
+    render();
+  }
+});
+
+document.addEventListener('change', e => {
+  if (e.target.matches('[data-psort]')) { sortBy = e.target.value; render(); }
+  if (e.target.matches('[data-tsort]')) { taskSort = e.target.value; render(); }
+  if (e.target.matches('[data-imgproj]')) { imagesPid = e.target.value; render(); }
+});
+
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-toggle]')) {
+    e.preventDefault();
+    toggleTask(e.target.dataset.pid, e.target.dataset.toggle);
+  } else if (e.key === 'Enter' && e.target.matches('[data-open]')) {
+    openId = e.target.dataset.open;
+    if (view === 'tasks') view = 'projects';
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
