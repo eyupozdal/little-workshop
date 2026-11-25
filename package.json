@@ -2,11 +2,12 @@
   "name": "little-workshop",
   "version": "1.1.0",
   "description": "Proje ilerleme takibi",
+  "author": "Eyüp Özdal",
   "main": "main.js",
   "private": true,
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win portable"
+    "build": "electron-builder --win nsis --publish never"
   },
   "devDependencies": {
     "electron": "^33.0.0",
@@ -15,12 +16,23 @@
   "build": {
     "appId": "com.eyup.littleworkshop",
     "productName": "Little Workshop",
-    "files": ["main.js", "index.html", "package.json"],
+    "files": [
+      "main.js",
+      "index.html",
+      "package.json"
+    ],
     "win": {
-      "target": ["portable"]
+      "target": [
+        "nsis"
+      ]
     },
-    "portable": {
-      "artifactName": "LittleWorkshop-${version}.exe"
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Little Workshop",
+      "artifactName": "LittleWorkshop-Setup-${version}.exe"
     }
   }
 }
