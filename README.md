@@ -1,4 +1,6 @@
-# Little Workshop (English)
+# English
+
+[Türkçe için](#türkçe)
 
 A simple desktop app for tracking your projects, tasks, and project visuals all in one place.
 
@@ -34,7 +36,7 @@ GitHub automatically generates the `.exe` file for Windows and adds it to the **
 
 
 
-# Little Workshop (Türkçe)
+# Türkçe
 
 Projelerini, görevlerini ve proje görsellerini tek bir yerden takip etmek için basit bir masaüstü uygulaması.
 
