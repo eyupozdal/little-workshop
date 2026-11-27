@@ -1,4 +1,40 @@
-# Little Workshop
+# Little Workshop (English)
+
+A simple desktop app for tracking your projects, tasks, and project visuals all in one place.
+
+## Features
+
+- **Projects:** Add a title, description, due date, and size. Size is indicated by 1, 2, or 3 gears.
+- **Tasks:** Add tasks to each project. Click to mark a task as complete; the progress percentage is calculated automatically.
+- **Labels:** Add colored labels to projects (green, purple, orange, red, blue, pink, white, navy-purple). You can filter by label.
+- **Sorting:** Sort by name, progress, due date, size, or order added.
+- **Archive:** Move completed or on-hold projects to the archive. You can restore them from the archive at any time.
+- **Project images:** Add, edit, and delete images for projects.
+
+All data is stored on your computer. No information is sent over the internet.
+
+## Installation
+
+1. Download the latest version’s `.exe` file from the **Releases** section on the right.
+2. Run the file. If Windows displays a “Protected by Windows” warning, select **More info → Run anyway**. This warning is caused by the application not being digitally signed.
+
+No installation required; it is a single file.
+
+## Development
+
+Requirements: [Node.js](https://nodejs.org) (version 20 or higher)
+
+```bash
+npm install     # bağımlılıkları kur
+npm start       # uygulamayı geliştirme modunda aç
+npm run build   # dist klasöründe .exe üret
+```
+The user interface is in the `index.html` file, and the window settings are in the `main.js` file.
+GitHub automatically generates the `.exe` file for Windows and adds it to the **Releases** page.
+
+
+
+# Little Workshop (Türkçe)
 
 Projelerini, görevlerini ve proje görsellerini tek bir yerden takip etmek için basit bir masaüstü uygulaması.
 
@@ -31,22 +67,4 @@ npm run build   # dist klasöründe .exe üret
 ```
 
 Arayüz `index.html` dosyasında, pencere ayarları `main.js` dosyasında.
-
-## Sürüm yayınlama
-
-1. `package.json` içindeki `version` değerini artır (örneğin `1.2.0`).
-2. Değişiklikleri gönder ve aynı sürüm numarasıyla bir etiket (tag) oluştur:
-
-```bash
-git add .
-git commit -m "Yeni özellikler"
-git push
-git tag v1.2.0
-git push origin v1.2.0
-```
-
 GitHub, Windows için `.exe` dosyasını otomatik üretir ve **Releases** sayfasına ekler.
-
-## Lisans
-
-Bu proje [MIT Lisansı](LICENSE) ile lisanslanmıştır.
